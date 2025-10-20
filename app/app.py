@@ -3,7 +3,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 # WARNING: replace with a secure random secret key in production
-app.secret_key = "replace-this-with-secure-random"
+app.secret_key = "Devops-assignment2"
 
 # Dummy data (in-memory)
 shows = [
