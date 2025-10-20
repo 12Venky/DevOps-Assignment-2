@@ -1,0 +1,5 @@
+body { font-family: 'Poppins', sans-serif; background: #f7f9fc; }
+.navbar-brand span { font-weight: 600; }
+.card { border-radius: 12px; }
+.btn-lg { border-radius: 10px; }
+img { max-height: 420px; object-fit: cover; }

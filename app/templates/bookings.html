@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mb-4">Your Bookings</h2>
+
+{% if bookings %}
+  <div class="row">
+    {% for b in bookings %}
+      <div class="col-md-6">
+        <div class="card mb-3 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">{{ b.show }}</h5>
+            <p class="card-text small text-muted">{{ b.date }} • {{ b.time }}</p>
+            <p class="mb-1">Name: {{ b.name }}</p>
+            <p class="mb-1">Seats: {{ b.seats }} • Total: ₹{{ b.total }}</p>
+            <p class="mb-1">Ref: <strong>{{ b.ref }}</strong></p>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="alert alert-info">No bookings found. <a href="{{ url_for('home') }}" class="alert-link">Book now</a>.</div>
+{% endif %}
+{% endblock %}

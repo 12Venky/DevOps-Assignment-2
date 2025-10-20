@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card shadow-lg p-4 text-center mx-auto" style="max-width:700px">
+  <h2 class="text-success">🎉 Booking Confirmed</h2>
+  <p class="mb-1">Booking Ref: <strong>{{ booking.ref }}</strong></p>
+  <p class="mb-1">{{ booking.name }} — {{ booking.email }}</p>
+  <p class="mb-1">Show: <strong>{{ booking.show }}</strong> ({{ booking.time }})</p>
+  <p class="mb-1">Date: <strong>{{ booking.date }}</strong> • Seats: <strong>{{ booking.seats }}</strong></p>
+  <p class="mb-3">Total Paid: <strong>₹{{ booking.total }}</strong></p>
+  <a class="btn btn-primary" href="{{ url_for('home') }}">Back to Home</a>
+</div>
+{% endblock %}
