@@ -1,70 +1,59 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    DOCKER_IMAGE = "18venky/ticket-booking-flask"
-    DOCKER_CREDENTIALS = credentials('docker-id-cred')
-    KUBECONFIG_CRED = credentials('kubeconfig-cred')         
-    K8S_NAMESPACE = 'default'
-  }
-
-  stages {
-    stage('Checkout') {
-      steps {
-        checkout scm
-      }
+    environment {
+        DOCKER_IMAGE = "18venky/ticket-booking-flask"
+        K8S_NAMESPACE = "default"
     }
 
-    stage('Install & Lint') {
-      steps {
-        bat '''
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        '''
-        // Add pytest or lint tools if needed
-      }
-    }
-
-    stage('Build Docker') {
-      steps {
-        withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDENTIALS, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-          bat """
-          echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
-          docker build -t ${DOCKER_IMAGE}:${env.BUILD_NUMBER} .
-          docker tag ${DOCKER_IMAGE}:${env.BUILD_NUMBER} ${DOCKER_IMAGE}:latest
-          docker push ${DOCKER_IMAGE}:${env.BUILD_NUMBER}
-          docker push ${DOCKER_IMAGE}:latest
-          """
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
         }
-      }
-    }
 
-    stage('Deploy to Kubernetes') {
-      steps {
-        withCredentials([file(credentialsId: env.KUBECONFIG_CRED, variable: 'KUBECONFIG_FILE')]) {
-          bat '''
-          if not exist "%USERPROFILE%\\.kube" mkdir "%USERPROFILE%\\.kube"
-          copy "%KUBECONFIG_FILE%" "%USERPROFILE%\\.kube\\config"
-          '''
-          bat """
-          kubectl apply -f k8s\\deployment.yaml --namespace ${env.K8S_NAMESPACE}
-          kubectl apply -f k8s\\service.yaml --namespace ${env.K8S_NAMESPACE}
-          kubectl apply -f k8s\\hpa.yaml --namespace ${env.K8S_NAMESPACE} || echo HPA skipped
-          kubectl set image deployment/ticket-booking-deployment ticket-booking-container=${DOCKER_IMAGE}:${env.BUILD_NUMBER} --namespace ${env.K8S_NAMESPACE}
-          kubectl rollout status deployment/ticket-booking-deployment --namespace ${env.K8S_NAMESPACE} --timeout=120s
-          """
+        stage('Build Docker') {
+            steps {
+                // Use credentials ID directly
+                withCredentials([usernamePassword(credentialsId: 'docker-id-cred', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    bat """
+                    echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
+                    docker build -t ${DOCKER_IMAGE}:%BUILD_NUMBER% .
+                    docker tag ${DOCKER_IMAGE}:%BUILD_NUMBER% ${DOCKER_IMAGE}:latest
+                    docker push ${DOCKER_IMAGE}:%BUILD_NUMBER%
+                    docker push ${DOCKER_IMAGE}:latest
+                    """
+                }
+            }
         }
-      }
-    }
-  }
 
-  post {
-    success {
-      echo "✅ SUCCESS: Build ${env.BUILD_NUMBER}"
+        stage('Deploy to Kubernetes') {
+            steps {
+                // Use kubeconfig file credential directly
+                withCredentials([file(credentialsId: 'kubeconfig-cred', variable: 'KUBECONFIG_FILE')]) {
+                    bat '''
+                    if not exist "%USERPROFILE%\\.kube" mkdir "%USERPROFILE%\\.kube"
+                    copy "%KUBECONFIG_FILE%" "%USERPROFILE%\\.kube\\config"
+                    '''
+                    bat """
+                    kubectl apply -f k8s\\deployment.yaml --namespace ${K8S_NAMESPACE}
+                    kubectl apply -f k8s\\service.yaml --namespace ${K8S_NAMESPACE}
+                    kubectl apply -f k8s\\hpa.yaml --namespace ${K8S_NAMESPACE} || echo HPA skipped
+                    kubectl set image deployment/ticket-booking-deployment ticket-booking-container=${DOCKER_IMAGE}:%BUILD_NUMBER% --namespace ${K8S_NAMESPACE}
+                    kubectl rollout status deployment/ticket-booking-deployment --namespace ${K8S_NAMESPACE} --timeout=120s
+                    """
+                }
+            }
+        }
     }
-    failure {
-      echo "❌ FAIL: Build ${env.BUILD_NUMBER}"
+
+    post {
+        success {
+            echo "✅ SUCCESS: Build ${env.BUILD_NUMBER}"
+        }
+        failure {
+            echo "❌ FAIL: Build ${env.BUILD_NUMBER}"
+        }
     }
-  }
 }
-
