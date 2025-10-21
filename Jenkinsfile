@@ -29,6 +29,9 @@ pipeline {
         stage('Test Application') {
             steps {
                 script {
+                    // Remove existing container if exists
+                    bat "docker rm -f test-app || echo No existing container"
+
                     // Run container on port 5000
                     bat "docker run -d --name test-app -p 5000:5000 ${DOCKER_IMAGE}:${DOCKER_TAG}"
                     
