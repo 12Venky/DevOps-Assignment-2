@@ -41,10 +41,10 @@ It provides a responsive UI with real-time seat selection, intuitive navigation,
 
 ## 🏗️ Architecture
 
-                 ┌────────────────────┐
-                 │    GitHub Repo     │
+                 ┌──────────────────────────┐
+                 │    GitHub Repo           │
                  │ 12Venky/Movie-Ticket-App │
-                 └─────────┬──────────┘
+                 └─────────┬────────────────┘
                            │
                            ▼
                  ┌────────────────────┐
@@ -53,10 +53,10 @@ It provides a responsive UI with real-time seat selection, intuitive navigation,
                  └─────────┬──────────┘
                            │
                            ▼
-                 ┌────────────────────┐
-                 │      Docker Hub    │
+                 ┌──────────────────────────┐
+                 │      Docker Hub          │
                  │ 18venky/movie-ticket-app │
-                 └─────────┬──────────┘
+                 └─────────┬────────────────┘
                            │
                            ▼
                  ┌────────────────────┐
@@ -74,3 +74,185 @@ It provides a responsive UI with real-time seat selection, intuitive navigation,
                  ┌────────────────────┐
                  │   Users / Clients  │
                  └────────────────────┘
+
+
+
+This shows how the source code from GitHub flows through Jenkins, gets built into a Docker image, pushed to Docker Hub, deployed to Kubernetes, and finally accessed by users through a LoadBalancer.
+
+## 📦 Prerequisites
+
+- **Python 3.10+**: [Download Python](https://www.python.org/downloads/)
+- **Docker**: [Install Docker](https://docs.docker.com/get-docker/)
+- **Kubernetes (kubectl)**: [Install kubectl](https://kubernetes.io/docs/tasks/tools/)
+- **Minikube** (for local K8s): [Install Minikube](https://minikube.sigs.k8s.io/docs/start/)
+- **Jenkins**: [Install Jenkins](https://www.jenkins.io/doc/book/installing/)
+- **Git**: [Install Git](https://git-scm.com/downloads)
+
+## 📁 Project Structure
+
+DevOps-Assignment-2/
+│
+├── app.py # Main Flask application
+├── requirements.txt # Python dependencies
+├── Dockerfile # Docker image configuration
+├── Jenkinsfile # Jenkins pipeline definition
+├── README.md # Project documentation
+├── .gitignore # Git ignore rules
+├── .dockerignore # Docker ignore rules
+│
+├── templates/ # Flask HTML templates
+│ ├── index.html
+│ ├── movies.html
+│ ├── seat_selection.html
+│ └── payment.html
+│
+├── static/ # Static assets
+│ ├── css/
+│ └── js/
+│
+├── k8s/ # Kubernetes manifests
+│ ├── deployment.yaml
+│ └── service.yaml
+│
+├── screenshots/ # Documentation screenshots
+│
+└── pycache/ # Python cache (auto-generated)
+
+
+## 🚀 Local Development
+
+```bash
+# Clone repository
+git clone https://github.com/12Venky/DevOps-Assignment-2.git
+cd DevOps-Assignment-2
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run Flask app
+python app.py
+```
+## 🐳 Docker Deployment
+```bash
+
+# Build Docker image
+docker build -t movie-ticket-app .
+
+# Run container
+docker run -d -p 8000:8000 --name movie-app movie-ticket-app
+
+# Stop and remove container
+docker stop movie-app && docker rm movie-app
+
+```
+
+## Push to Docker Hub:
+
+```bash 
+docker tag movie-ticket-app 18venky/movie-ticket-app:latest
+docker login
+docker push 18venky/movie-ticket-app:latest
+```
+## ☸️ Kubernetes Deployment
+```bash
+# Start Minikube
+minikube start
+
+# Apply Kubernetes manifests
+kubectl apply -f k8s/
+
+# Check status
+kubectl get pods
+kubectl get services
+```
+
+Scale replicas:
+```bash
+
+kubectl scale deployment movie-ticket-app --replicas=3
+```
+## Delete deployment:
+```bash
+kubectl delete -f k8s/
+```
+## 🔄 CI/CD Pipeline
+
+The CI/CD pipeline automates the build, test, push, and deployment process of the Movie Ticket Booking Platform using **Jenkins**, **Docker**, and **Kubernetes**.
+
+### Pipeline Stages
+
+1. **Checkout Code**
+   - Clones the latest code from GitHub repository.
+   - Ensures Jenkins always builds the latest version.
+
+2. **Build Docker Image**
+   - Builds a Docker image from the `Dockerfile`.
+   - Tags the image with your Docker Hub repository.
+
+3. **Test Application**
+   - Runs automated health checks on the container.
+   - Ensures application is working before deployment.
+
+4. **Push to Docker Hub**
+   - Pushes the tested Docker image to Docker Hub registry.
+   - Allows Kubernetes to pull the image for deployment.
+
+5. **Deploy to Kubernetes**
+   - Applies Kubernetes manifests (`deployment.yaml` and `service.yaml`).
+   - Deploys the application with configured replicas and load balancing.
+
+---
+
+### Jenkins Setup
+
+1. **Install Jenkins** and required plugins:
+   - Docker Pipeline
+   - Kubernetes CLI
+   - Git
+
+2. **Configure Jenkins Credentials**:
+   - **Docker Hub Credentials**
+     - Kind: Username with Password
+     - ID: `docker-hub-cred`
+     - Username: `12venky`
+     - Password: Docker Hub password/token
+   - **Kubernetes Config**
+     - Kind: Secret file
+     - ID: `kubeconfig`
+     - File: Upload your `~/.kube/config`
+
+3. **Create Pipeline Job**
+   - New Item → Pipeline
+   - Configure SCM to point to GitHub repository
+   - Select `Jenkinsfile` as the pipeline script
+
+4. **Run the Pipeline**
+   - Click "Build Now"
+   - Monitor stages and logs in Jenkins dashboard
+
+---
+
+### Pipeline Environment Variables
+
+```groovy
+DOCKERHUB_CREDENTIALS = credentials('docker-hub-cred')
+DOCKER_IMAGE = '18venky/movie-ticket-app'
+K8S_NAMESPACE = 'default'
+
+```
+
+##  👤 Author
+Venkateshwararao Daravath
+
+GitHub: https://github.com/12Venky
+
+Docker Hub: https://hub.docker.com/u/18venky
+
+## 🙏 Acknowledgments
+
+- Flask framework for the web application
+- Docker for containerization
+- Kubernetes for orchestration
+- Jenkins for CI/CD automation
+
+
