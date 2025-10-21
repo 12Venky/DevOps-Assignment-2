@@ -15,16 +15,6 @@ pipeline {
       }
     }
 
-    stage('Install & Lint') {
-      steps {
-        bat '''
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        '''
-        // Add pytest or lint tools if needed
-      }
-    }
-
     stage('Build Docker') {
       steps {
         withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDENTIALS, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
@@ -67,4 +57,3 @@ pipeline {
     }
   }
 }
-
