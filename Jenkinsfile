@@ -29,14 +29,19 @@ pipeline {
         stage('Test Application') {
             steps {
                 script {
-                    bat "docker run -d --name test-app -p 8000:8000 ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    // Run container on port 5000
+                    bat "docker run -d --name test-app -p 5000:5000 ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    
+                    // Wait for app to start
                     bat 'ping 127.0.0.1 -n 10 >nul'
 
+                    // Health check using PowerShell curl
                     bat """
-                    powershell -Command "curl http://localhost:8000/health -UseBasicParsing"
-                    powershell -Command "curl http://localhost:8000/ -UseBasicParsing"
+                    powershell -Command "curl http://localhost:5000/health -UseBasicParsing"
+                    powershell -Command "curl http://localhost:5000/ -UseBasicParsing"
                     """
 
+                    // Stop and remove container
                     bat "docker stop test-app && docker rm test-app"
                 }
             }
@@ -65,6 +70,7 @@ pipeline {
                     kubectl apply -f k8s\\deployment.yaml --namespace ${K8S_NAMESPACE}
                     kubectl apply -f k8s\\service.yaml --namespace ${K8S_NAMESPACE}
                     kubectl apply -f k8s\\hpa.yaml --namespace ${K8S_NAMESPACE} || echo HPA skipped
+
                     kubectl set image deployment/ticket-booking-deployment ticket-booking-container=${DOCKER_IMAGE}:${DOCKER_TAG} --namespace ${K8S_NAMESPACE}
                     kubectl rollout status deployment/ticket-booking-deployment --namespace ${K8S_NAMESPACE} --timeout=120s
                     """
