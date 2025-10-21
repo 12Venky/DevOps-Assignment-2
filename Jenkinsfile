@@ -3,8 +3,8 @@ pipeline {
 
   environment {
     DOCKER_IMAGE = "18venky/ticket-booking-flask"
-    DOCKER_CREDENTIALS = 'docker-id-cred'     
-    KUBECONFIG_CRED = 'kubeconfig-cred'         
+    DOCKER_CREDENTIALS = credentials('docker-id-cred')
+    KUBECONFIG_CRED = credentials('kubeconfig-cred')         
     K8S_NAMESPACE = 'default'
   }
 
@@ -67,3 +67,4 @@ pipeline {
     }
   }
 }
+
