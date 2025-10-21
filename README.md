@@ -89,34 +89,36 @@ This shows how the source code from GitHub flows through Jenkins, gets built int
 - **Git**: [Install Git](https://git-scm.com/downloads)
 
 ## 📁 Project Structure
-
+```bash
 DevOps-Assignment-2/
 │
-├── app.py # Main Flask application
-├── requirements.txt # Python dependencies
-├── Dockerfile # Docker image configuration
-├── Jenkinsfile # Jenkins pipeline definition
-├── README.md # Project documentation
-├── .gitignore # Git ignore rules
-├── .dockerignore # Docker ignore rules
+├── app.py                      # Main Flask application
+├── requirements.txt             # Python dependencies
+├── Dockerfile                   # Docker image configuration
+├── Jenkinsfile                  # Jenkins pipeline definition
+├── README.md                    # Project documentation
+├── .gitignore                   # Git ignore rules
+├── .dockerignore                # Docker ignore rules
 │
-├── templates/ # Flask HTML templates
-│ ├── index.html
-│ ├── movies.html
-│ ├── seat_selection.html
-│ └── payment.html
+├── templates/                   # Flask HTML templates
+│   ├── index.html
+│   ├── movies.html
+│   ├── seat_selection.html
+│   └── payment.html
 │
-├── static/ # Static assets
-│ ├── css/
-│ └── js/
+├── static/                      # Static assets
+│   ├── css/                     # Stylesheets
+│   └── js/                      # JavaScript files
 │
-├── k8s/ # Kubernetes manifests
-│ ├── deployment.yaml
-│ └── service.yaml
+├── k8s/                         # Kubernetes manifests
+│   ├── deployment.yaml
+│   └── service.yaml
 │
-├── screenshots/ # Documentation screenshots
+├── screenshots/                 # Documentation screenshots
 │
-└── pycache/ # Python cache (auto-generated)
+└── __pycache__/                 # Python cache (auto-generated)
+
+```
 
 
 ## 🚀 Local Development
