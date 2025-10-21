@@ -138,10 +138,11 @@ python app.py
 ```bash
 
 # Build Docker image
-docker build -t movie-ticket-app .
+docker build -t 18venky/ticket-booking-flask:latest .
+
 
 # Run container
-docker run -d -p 8000:8000 --name movie-app movie-ticket-app
+docker run -d -p 5000:5000 18venky/ticket-booking-flask:latest
 
 # Stop and remove container
 docker stop movie-app && docker rm movie-app
@@ -151,9 +152,10 @@ docker stop movie-app && docker rm movie-app
 ## Push to Docker Hub:
 
 ```bash 
-docker tag movie-ticket-app 18venky/movie-ticket-app:latest
+docker tag movie-ticket-app 18venky/ticket-booking-flask:latest
 docker login
-docker push 18venky/movie-ticket-app:latest
+docker push 18venky/ticket-booking-flask:latest
+
 ```
 ## ☸️ Kubernetes Deployment
 ```bash
@@ -171,7 +173,7 @@ kubectl get services
 Scale replicas:
 ```bash
 
-kubectl scale deployment movie-ticket-app --replicas=3
+kubectl scale deployment ticket-booking-flask --replicas=3
 ```
 ## Delete deployment:
 ```bash
